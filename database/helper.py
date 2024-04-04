@@ -18,14 +18,14 @@ class DatabaseHelper:
             (
                 id INTEGER NOT NULL AUTOINCREMENT,
                 process_id TEXT,
-                humidity REAL, 
-                temperature REAL, 
-                ec REAL, 
-                ph REAL, 
+                humidity REAL,
+                temperature REAL,
+                ec REAL,
+                ph REAL,
                 nitrogen REAL,
-                phophorus REAL, 
+                phophorus REAL,
                 potassium REAL,
-                timestamp DATETIME, 
+                timestamp DATETIME,
                 PRIMARY KEY (id)
             );
             '''
@@ -35,7 +35,7 @@ class DatabaseHelper:
             CREATE TABLE IF NOT EXISTS process_data
             (
                 process_id TEXT AUTOINCREMENT,
-                start_time DATETIME, 
+                start_time DATETIME,
                 end_time DATETIME,
                 current_phase TEXT,
                 mature_percentage REAL,
@@ -51,7 +51,7 @@ class DatabaseHelper:
     def InsertSensorData(self, sensorData:SensorData):
         cursor = self.connection.cursor()
         cursor.execute('''
-                       INSERT INTO sensor_data (process_id, timestamp, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium) 
+                       INSERT INTO sensor_data (process_id, timestamp, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
                        ''',
                        (
@@ -94,22 +94,22 @@ class DatabaseHelper:
     def InsertProcessData(self, processData:ProcessData):
         cursor = self.connection.cursor()
         cursor.execute('''
-                       INSERT INTO process_data (process_id, start_time, end_time, current_phase, mature_percentage, mature_result) 
+                       INSERT INTO process_data (process_id, start_time, end_time, current_phase, mature_percentage, mature_result)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
                        ''',
                        (
-                           processData.process_id, 
-                           convert_datetime_to_string(processData.start_time), 
-                           convert_datetime_to_string(processData.end_time), 
-                           processData.current_phase, 
-                           processData.mature_percentage, 
-                           processData.mature_result, 
+                           processData.process_id,
+                           convert_datetime_to_string(processData.start_time),
+                           convert_datetime_to_string(processData.end_time),
+                           processData.current_phase,
+                           processData.mature_percentage,
+                           processData.mature_result,
                        )
         )
         self.connection.commit()
         cursor.close()
-    
-    def GetSensorData(self, process_id:str):
+
+    def GetProcessData(self, process_id:str):
         processData:ProcessData = None
 
         cursor = self.connection.cursor()
