@@ -2,7 +2,6 @@ from utils import *
 
 app = FastAPI(title='Compost Automation')
 
-
 class BackgroundTasks(threading.Thread):
     def run(self,*args,**kwargs):
         while True:
@@ -86,7 +85,7 @@ def stop_process():
     except Exception as ex: raise HTTPException(500, ex)
 
 @app.get("/data/process/", status_code=200)
-async def get_sensor_data(process_id:str):
+async def get_process_data(process_id:str):
     try: 
         if not MOCK_API:
             #TODO
@@ -107,6 +106,21 @@ async def get_sensor_data(process_id:str):
                 ).convert_to_dict()
             }
     except Exception as ex: raise HTTPException(500, ex)
+
+@app.get("/current_process", status_code=200)
+async def get_current_process_id():
+    try:
+        if not MOCK_API:
+            #TODO
+            return {
+                'process_id': 'process_id'
+            }
+        else:
+            return {
+                'process_id': create_process_id()
+            }
+    except Exception as ex: raise HTTPException(500, ex)
+
 
 
 if __name__ == '__main__':
