@@ -26,7 +26,7 @@ def exception_handler(request: Request, exc: Exception):
         content={'message': 'Error', 'detail': str(exc)},
     )
 
-@app.get("/data/sensor/", status_code=200)
+@app.get("/data/sensor", status_code=200)
 async def get_sensor_data(process_id:str):
     try: 
         if not MOCK_API:
@@ -84,7 +84,7 @@ def stop_process():
             }
     except Exception as ex: raise HTTPException(500, ex)
 
-@app.get("/data/process/", status_code=200)
+@app.get("/data/process", status_code=200)
 async def get_process_data(process_id:str):
     try: 
         if not MOCK_API:
