@@ -9,16 +9,15 @@ class DatabaseHelper:
     def __init__(self):
         self.connection = sqlite3.connect(DATABASE_PATH)
 
-        self.CreateTableIfNotExists()
+        self.CreateTablesIfNotExists()
 
-    def CreateTableIfNotExists(self):
+    def CreateTablesIfNotExists(self):
         cursor = self.connection.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS sensor_data
             (
                 id INTEGER NOT NULL AUTOINCREMENT,
                 process_id TEXT,
-                timestamp TEXT DEFAULT CURRENT_TIMESTAMP, 
                 humidity REAL, 
                 temperature REAL, 
                 ec REAL, 
@@ -26,18 +25,46 @@ class DatabaseHelper:
                 nitrogen REAL,
                 phophorus REAL, 
                 potassium REAL,
+                timestamp DATETIME, 
                 PRIMARY KEY (id)
             );
             '''
         )
 
-    def InsertSensorData(self, process_id:str, sensorData:SensorData):
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS process_data
+            (
+                process_id TEXT AUTOINCREMENT,
+                start_time DATETIME, 
+                end_time DATETIME,
+                current_phase TEXT,
+                mature_percentage REAL,
+                mature_result TEXT,
+                PRIMARY KEY (process_id)
+            );
+            '''
+        )
+
+        self.connection.commit()
+        cursor.close()
+
+    def InsertSensorData(self, sensorData:SensorData):
         cursor = self.connection.cursor()
         cursor.execute('''
-                       INSERT INTO sensor_data (process_id, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium) 
+                       INSERT INTO sensor_data (process_id, timestamp, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium) 
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
                        ''',
-                       (process_id, sensorData.humidity, sensorData.temperature, sensorData.ec, sensorData.ph, sensorData.nitrogen, sensorData.phosphorus, sensorData.potassium)
+                       (
+                           sensorData.process_id,
+                           convert_datetime_to_string(sensorData.timestamp),
+                           sensorData.humidity,
+                           sensorData.temperature,
+                           sensorData.ec,
+                           sensorData.ph,
+                           sensorData.nitrogen,
+                           sensorData.phosphorus,
+                           sensorData.potassium
+                       )
         )
         self.connection.commit()
         cursor.close()
@@ -46,21 +73,41 @@ class DatabaseHelper:
         sensorDataList:List[SensorData] = []
 
         cursor = self.connection.cursor()
-        cursor.execute("SELECT humidity, temperature, ec, ph, nitrogen, phosphorus, potassium FROM sensor_data WHERE process_id = ?", (process_id,))
+        cursor.execute("SELECT process_id, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium, timestamp FROM sensor_data WHERE process_id = ?", (process_id,))
 
         rows = cursor.fetchall()
         for row in rows:
             sensorDataList.append(SensorData(
-                humidity = row[0],
-                temperature = row[1],
-                ec = row[2],
-                ph = row[3],
-                nitrogen = row[4],
-                phosphorus = row[5],
-                potassium = row[6]
+                process_id = row[0],
+                humidity = row[1],
+                temperature = row[2],
+                ec = row[3],
+                ph = row[4],
+                nitrogen = row[5],
+                phosphorus = row[6],
+                potassium = row[7],
+                timestamp = row[8]
             ))
         cursor.close()
         return sensorDataList
+
+    def InsertProcessData(self, processData:ProcessData):
+        cursor = self.connection.cursor()
+        cursor.execute('''
+                       INSERT INTO process_data (process_id, start_time, end_time, current_phase, mature_percentage, mature_result) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                       ''',
+                       (
+                           processData.process_id, 
+                           convert_datetime_to_string(processData.start_time), 
+                           convert_datetime_to_string(processData.end_time), 
+                           processData.current_phase, 
+                           processData.mature_percentage, 
+                           processData.mature_result, 
+                       )
+        )
+        self.connection.commit()
+        cursor.close()
 
 if __name__ == '__main__':
     databaseHelper:DatabaseHelper = DatabaseHelper()

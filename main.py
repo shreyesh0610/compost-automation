@@ -26,19 +26,62 @@ def exception_handler(request: Request, exc: Exception):
         content={'message': 'Error', 'detail': str(exc)},
     )
 
-@app.get("/sensor_data/", status_code=200, tags=[FastAPITag.UI])
-async def get_feed_data(process_id:str):
+@app.get("/data/sensor/", status_code=200, tags=[FastAPITag.UI])
+async def get_sensor_data(process_id:str):
     try: 
-
+        if not MOCK_API:
+            #TODO
+            return {
+                'process_id': process_id,
+                'results': []
+            }
+        else:
+            return {
+                'process_id': process_id,
+                'results' : [SensorData(
+                    process_id = process_id,
+                    humidity = random.uniform(1.0,100.0),
+                    temperature = random.uniform(1.0,100.0),
+                    ec = random.uniform(1.0,100.0),
+                    ph = random.uniform(1.0,100.0),
+                    nitrogen = random.uniform(1.0,100.0),
+                    phosphorus = random.uniform(1.0,100.0),
+                    potassium = random.uniform(1.0,100.0),
+                    timestamp = datetime.now(pytz.utc)
+                ).convert_to_dict() for _ in range(random.randint(1,10))]
+            }
     except Exception as ex: raise HTTPException(500, ex)
 
 @app.post("/start", status_code=200, tags=[FastAPITag.UI])
-def toggle_count():
+def start_process():
     try:
-        success = FeedManager.UpdateCount(feed_id, requestToggle)
-        if success: return {"message": "Update Count - Success"}
-        else: return {"message": "Update Count - Failed"}
+        if not MOCK_API:
+            #TODO
+            return {
+                'process_id': '',
+                'message': 'Process Started'
+            }
+        else:
+            return {
+                'process_id' : create_process_id(),
+                'message': 'Process Started'
+            }
+    except Exception as ex: raise HTTPException(500, ex)
 
+@app.post("/stop", status_code=200, tags=[FastAPITag.UI])
+def stop_process():
+    try:
+        if not MOCK_API:
+            #TODO
+            return {
+                'process_id': '',
+                'message': 'Process Stopped'
+            }
+        else:
+            return {
+                'process_id' : create_process_id(),
+                'message': 'Process Stopped'
+            }
     except Exception as ex: raise HTTPException(500, ex)
 
 
