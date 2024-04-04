@@ -76,7 +76,7 @@ def create_process_id():
     return process_id
 
 def convert_datetime_to_string(dt:datetime):
-    dt_string = datetime.strftime('%Y-%m-%d %H:%M:%S')
+    dt_string = datetime.strftime(dt, '%Y-%m-%d %H:%M:%S')
     return dt_string
 
 def convert_string_to_datetime(dt_string:str):

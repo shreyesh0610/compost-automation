@@ -86,7 +86,7 @@ class DatabaseHelper:
                 nitrogen = row[5],
                 phosphorus = row[6],
                 potassium = row[7],
-                timestamp = row[8]
+                timestamp = convert_string_to_datetime(row[8])
             ))
         cursor.close()
         return sensorDataList
@@ -108,6 +108,26 @@ class DatabaseHelper:
         )
         self.connection.commit()
         cursor.close()
+    
+    def GetSensorData(self, process_id:str):
+        processData:ProcessData = None
+
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT process_id, start_time, end_time, current_phase, mature_percentage, mature_result FROM process_data WHERE process_id = ?", (process_id,))
+
+        rows = cursor.fetchall()
+        for row in rows:
+            processData:ProcessData = ProcessData(
+                process_id = row[0],
+                start_time = row[1],
+                end_time = row[2],
+                current_phase = row[3],
+                mature_percentage = row[4],
+                mature_result = row[5]
+            )
+            break
+        cursor.close()
+        return processData
 
 if __name__ == '__main__':
     databaseHelper:DatabaseHelper = DatabaseHelper()
