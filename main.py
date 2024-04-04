@@ -27,7 +27,7 @@ def exception_handler(request: Request, exc: Exception):
         content={'message': 'Error', 'detail': str(exc)},
     )
 
-@app.get("/data/sensor/", status_code=200, tags=[FastAPITag.UI])
+@app.get("/data/sensor/", status_code=200)
 async def get_sensor_data(process_id:str):
     try: 
         if not MOCK_API:
@@ -53,7 +53,7 @@ async def get_sensor_data(process_id:str):
             }
     except Exception as ex: raise HTTPException(500, ex)
 
-@app.post("/start", status_code=200, tags=[FastAPITag.UI])
+@app.post("/start", status_code=200)
 def start_process():
     try:
         if not MOCK_API:
@@ -69,7 +69,7 @@ def start_process():
             }
     except Exception as ex: raise HTTPException(500, ex)
 
-@app.post("/stop", status_code=200, tags=[FastAPITag.UI])
+@app.post("/stop", status_code=200)
 def stop_process():
     try:
         if not MOCK_API:
@@ -82,6 +82,29 @@ def stop_process():
             return {
                 'process_id' : create_process_id(),
                 'message': 'Process Stopped'
+            }
+    except Exception as ex: raise HTTPException(500, ex)
+
+@app.get("/data/process/", status_code=200)
+async def get_sensor_data(process_id:str):
+    try: 
+        if not MOCK_API:
+            #TODO
+            return {
+                'process_id': process_id,
+                'result': {}
+            }
+        else:
+            return {
+                'process_id': process_id,
+                'result' : ProcessData(
+                    process_id = 'random_process_id',
+                    start_time = datetime.now(pytz.utc) - timedelta(hours=2),
+                    end_time = datetime.now(pytz.utc),
+                    current_phase = 'Phase 1',
+                    mature_percentage = 67.5,
+                    mature_result = 'Immature'
+                ).convert_to_dict()
             }
     except Exception as ex: raise HTTPException(500, ex)
 

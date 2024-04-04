@@ -3,11 +3,6 @@ import os
 
 from utils.helper import *
 
-class FastAPITag(Enum):
-    def __str__(self): return self.value    
-    UI = "UI"
-    Internal = "Internal"
-
 class SensorData:
     def __init__(self,
                  process_id:str,
@@ -36,11 +31,11 @@ class SensorData:
             "humidity": self.humidity,
             "temperature": self.temperature,
             "ec": self.ec,
-            "ph": self.ph,
-            "nitrogen": self.nitrogen,
-            "phosphorus": self.phosphorus,
-            "potassium": self.potassium,
-            "timestamp": convert_datetime_to_string(self.timestamp)
+            'ph': self.ph,
+            'nitrogen': self.nitrogen,
+            'phosphorus': self.phosphorus,
+            'potassium': self.potassium,
+            'timestamp': convert_datetime_to_string(self.timestamp)
         }
 
 class ProcessData:
@@ -62,10 +57,10 @@ class ProcessData:
     
     def convert_to_dict(self):
         return {
-            "process_id": self.process_id,
-            "start_time": convert_datetime_to_string(self.start_time),
-            "end_time": convert_datetime_to_string(self.end_time),
-            "current_phase": self.current_phase,
-            "mature_percentage": self.mature_percentage,
-            "mature_result": self.mature_result
+            'process_id': self.process_id,
+            'start_time': convert_datetime_to_string(self.start_time),
+            'end_time': convert_datetime_to_string(self.end_time),
+            'current_phase': self.current_phase,
+            'mature_percentage': self.mature_percentage,
+            'mature_result': self.mature_result
         }
