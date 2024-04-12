@@ -109,6 +109,27 @@ class DatabaseHelper:
         self.connection.commit()
         cursor.close()
 
+    def UpdateProcessData(self, processData: ProcessData):
+        cursor = self.connection.cursor()
+        cursor.execute('''
+                    UPDATE process_data
+                    SET end_time = ?,
+                        current_phase = ?,
+                        mature_percentage = ?,
+                        mature_result = ?
+                    WHERE process_id = ?;
+                    ''',
+                    (
+                        convert_datetime_to_string(processData.end_time),
+                        processData.current_phase,
+                        processData.mature_percentage,
+                        processData.mature_result,
+                        processData.process_id
+                    )
+        )
+        self.connection.commit()
+        cursor.close()
+
     def GetProcessData(self, process_id:str):
         processData:ProcessData = None
 
@@ -125,7 +146,27 @@ class DatabaseHelper:
                 mature_percentage = row[4],
                 mature_result = row[5]
             )
-            break
+            break #- only 1
+        cursor.close()
+        return processData
+
+    def GetCurrentProcess(self):
+        processData:ProcessData = None
+
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT process_id, start_time, end_time, current_phase, mature_percentage, mature_result FROM process_data WHERE end_time IS NULL ORDER BY start_time DESC")
+
+        rows = cursor.fetchall()
+        for row in rows:
+            processData:ProcessData = ProcessData(
+                process_id = row[0],
+                start_time = row[1],
+                end_time = row[2],
+                current_phase = row[3],
+                mature_percentage = row[4],
+                mature_result = row[5]
+            )
+            break #- only 1
         cursor.close()
         return processData
 
