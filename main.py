@@ -1,4 +1,8 @@
+import os
+import sys
+
 from utils import *
+from helper import *
 
 app = FastAPI(title='Compost Automation')
 
@@ -6,7 +10,7 @@ class BackgroundTasks(threading.Thread):
     def run(self,*args,**kwargs):
         while True:
             pass
-        # if SCRIPT_NAME != 'manager': 
+        # if SCRIPT_NAME != 'manager':
         #     from process import poppy
         #     poppy([p.strip() for p in PROCESS_FEED_IDS.split(",") if p.strip()])
         #     killer.crash_it()
@@ -28,12 +32,11 @@ def exception_handler(request: Request, exc: Exception):
 
 @app.get("/data/sensor", status_code=200)
 async def get_sensor_data(process_id:str):
-    try: 
+    try:
         if not MOCK_API:
-            #TODO
             return {
                 'process_id': process_id,
-                'results': []
+                'results': [sD.convert_to_dict() for sD in databaseHelper.GetSensorData(process_id=process_id)]
             }
         else:
             return {
@@ -56,9 +59,8 @@ async def get_sensor_data(process_id:str):
 def start_process():
     try:
         if not MOCK_API:
-            #TODO
             return {
-                'process_id': '',
+                'process_id': StartNewProcess(),
                 'message': 'Process Started'
             }
         else:
@@ -72,9 +74,8 @@ def start_process():
 def stop_process():
     try:
         if not MOCK_API:
-            #TODO
             return {
-                'process_id': '',
+                'process_id': StopProcess(),
                 'message': 'Process Stopped'
             }
         else:
@@ -86,12 +87,11 @@ def stop_process():
 
 @app.get("/data/process", status_code=200)
 async def get_process_data(process_id:str):
-    try: 
+    try:
         if not MOCK_API:
-            #TODO
             return {
                 'process_id': process_id,
-                'result': {}
+                'result': databaseHelper.GetProcessData(process_id = process_id).convert_to_dict()
             }
         else:
             return {
@@ -110,17 +110,10 @@ async def get_process_data(process_id:str):
 @app.get("/current_process", status_code=200)
 async def get_current_process_id():
     try:
-        if not MOCK_API:
-            #TODO
-            return {
-                'process_id': 'process_id'
-            }
-        else:
-            return {
-                'process_id': create_process_id()
-            }
-    except Exception as ex: raise HTTPException(500, ex)
+        if not MOCK_API: return {'process_id': GetCurrentProcessID()}
+        else: return {'process_id': create_process_id()}
 
+    except Exception as ex: raise HTTPException(500, ex)
 
 
 if __name__ == '__main__':

@@ -24,7 +24,7 @@ class SensorData:
         self.phosphorus = phosphorus
         self.potassium = potassium
         self.timestamp = timestamp
-    
+
     def convert_to_dict(self):
         return {
             'process_id': self.process_id,
@@ -47,14 +47,14 @@ class ProcessData:
                 mature_percentage:float,
                 mature_result:str
     ):
-        
+
         self.process_id = process_id
         self.start_time = start_time
         self.end_time = end_time
         self.current_phase = current_phase
         self.mature_percentage = mature_percentage
         self.mature_result = mature_result
-    
+
     def convert_to_dict(self):
         return {
             'process_id': self.process_id,
