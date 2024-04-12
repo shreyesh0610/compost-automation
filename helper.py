@@ -46,7 +46,6 @@ def StopProcess(process_id:str):
     return process_id
 
 def BackgroundProcess():
-
     while True:
 
         #* get current process id
@@ -59,6 +58,7 @@ def BackgroundProcess():
         StartCompostProcessor()
 
         #* Read sensor data from Arduino
+        #region Sensor Data
         sensor_data_string = next(arduinoGenerator, None)
         if not sensor_data_string.strip(): continue
 
@@ -98,4 +98,10 @@ def BackgroundProcess():
         )
         print(f'{current_process_id} >> Inserting sensor data')
         databaseHelper.InsertSensorData(sensorData=sensorData)
+        #endregion
+
+        #* ML Model
+        #region ML Model
+        #TODO - Call ML Model every 1 hour to get phase, maturity and maturity percentage
+        #TODO - update process data in DB
         #endregion
