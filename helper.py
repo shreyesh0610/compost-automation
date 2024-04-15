@@ -9,7 +9,15 @@ from embedded import *
 databaseHelper:DatabaseHelper = DatabaseHelper()
 
 arduinoGenerator = ReadFromArduino(ARDUINO_SENSOR_PORT)
-last_sync_time = datetime.now(pytz.utc)
+LAST_SYNC_TIME = datetime.now(pytz.utc).replace(tzinfo=None)
+
+def ShouldProcessML():
+    #- function to monitor if its been 1 hour since last ML run
+    global LAST_SYNC_TIME
+
+    if LAST_SYNC_TIME < datetime.now(pytz.utc).replace(tzinfo=None) - timedelta(hours=1): 
+        return True
+    return False
 
 def GetCurrentProcessID():
     processData:ProcessData = databaseHelper.GetCurrentProcess()
