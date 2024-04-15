@@ -5,11 +5,12 @@ import sys
 from utils import *
 from database import *
 from embedded import *
+from ml import *
 
 databaseHelper:DatabaseHelper = DatabaseHelper()
 
 arduinoGenerator = ReadFromArduino(ARDUINO_SENSOR_PORT)
-LAST_SYNC_TIME = datetime.now(pytz.utc).replace(tzinfo=None)
+LAST_SYNC_TIME = datetime.now(pytz.utc).replace(tzinfo=None)- timedelta(hours=1)
 
 def ShouldProcessML():
     #- function to monitor if its been 1 hour since last ML run
@@ -56,7 +57,7 @@ def StopProcess(process_id:str):
 def BackgroundProcess():
     while True:
 
-        #* get current process id
+        #* Get current process id
         current_process_id:str = GetCurrentProcessID()
         if not current_process_id:
             print('There is no process in progress currently. Sleeping for 60 seconds')
@@ -110,6 +111,23 @@ def BackgroundProcess():
 
         #* ML Model
         #region ML Model
-        #TODO - Call ML Model every 1 hour to get phase, maturity and maturity percentage
-        #TODO - update process data in DB
+        predicted_phase = mlHelper.PredictPhase(
+            temperature = sensorData.temperature,
+            humidity = sensorData.humidity,
+        )
+        predicted_maturity = mlHelper.PredictMaturity(
+            temperature = sensorData.temperature,
+            humidity = sensorData.humidity,
+        )
         #endregion
+
+        processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
+
+        processData.current_phase = predicted_phase
+        processData.mature_result = predicted_maturity
+
+        #TODO - decide percentage
+        #TODO - decide between phase 1 and 3
+        #TODO - process maturity only if phase 4
+
+        databaseHelper.UpdateProcessData(processData)
