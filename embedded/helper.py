@@ -10,10 +10,12 @@ import RPi.GPIO as GPIO
 from utils import *
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(PROCESSOR_PIN_NO, GPIO.OUT)
+GPIO.setup(PROCESSOR_RUN_PIN_NO, GPIO.OUT)
+GPIO.setup(PROCESSOR_PHASE_PIN_NO_1, GPIO.OUT)
+GPIO.setup(PROCESSOR_PHASE_PIN_NO_2, GPIO.OUT)
 
 
-def ReadFromArduino(serial_port:str):
+def RPReadFromArduino(serial_port:str):
     ser = serial.Serial(port = serial_port, baudrate = 9600)
 
     while True:
@@ -21,10 +23,29 @@ def ReadFromArduino(serial_port:str):
             line = ser.readline().decode('utf-8').rstrip()
             yield line
 
-def StartCompostProcessor():
+def RPStartCompostProcessor():
     print('Starting Compost Processor')
-    GPIO.output(PROCESSOR_PIN_NO, GPIO.HIGH)
+    GPIO.output(PROCESSOR_RUN_PIN_NO, GPIO.HIGH)
 
-def StopCompostProcessor():
+def RPStopCompostProcessor():
     print('Stopping Compost Processor')
-    GPIO.output(PROCESSOR_PIN_NO, GPIO.LOW)
+    GPIO.output(PROCESSOR_RUN_PIN_NO, GPIO.LOW)
+
+def RPSetProcessorPhase(phase_no:int):
+    print('Setting Compost Processor Phase: Phase {phase_no}')
+
+    if phase_no == 1: #- 00
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+    elif phase_no == 2: #- 01
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
+    elif phase_no == 3: #- 10
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+    elif phase_no == 4: #- 11
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
+    else: #- default 00
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
