@@ -1,8 +1,10 @@
+db-sqlite3==0.0.1
 fastapi==0.101.1
+nanoid
+openpyxl
 pandas==2.0.3
+pydantic==2.3.0
 pytz==2023.3
 requests
+scikit-learn
 uvicorn==0.22.0
-pydantic==2.3.0
-db-sqlite3==0.0.1
-nanoid

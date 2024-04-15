@@ -18,9 +18,10 @@ class MLHelper:
 
         #- Read Dataframe
         self.dataset_df = self.ReadDatasetToDF()
+        # /workspaces/compost-automation/ml/dataset.xlsx
 
         #- Train Models
-        self.model_LR = self.TrainRFModel()
+        self.model_LR = self.TrainLRModel()
         self.model_RF = self.TrainRFModel()
 
     def ReadDatasetToDF(self):
@@ -34,13 +35,19 @@ class MLHelper:
     def TrainLRModel(self):
         #- Check column names of the Linear Regression sheet
         lr_df:pd.DataFrame = self.dataset_df[LR_SHEET_NAME]
-        lr_df.columns = lr_df.columns.str.strip()
+
+        lr_df['Temperature'] = lr_df['Temperature'].astype(float)
+        lr_df['Humidity'] = lr_df['Humidity'].astype(float)
+
+        lr_df.dropna(inplace=True)
         print("LR Data Columns:", lr_df.columns)
 
         #- Train Linear Regression Model
         X_linear = lr_df[['Temperature', 'Humidity']]
+        Y_linear = lr_df['Phase']
+
         self.model_LR = LinearRegression()
-        self.model_LR.fit(X_linear, lr_df['Phase'])
+        self.model_LR.fit(X_linear, Y_linear)
 
         return self.model_LR
 
@@ -74,9 +81,8 @@ class MLHelper:
 
         return predicted_maturity[0]
 
-
 if __name__ == '__main__':
     mlHelper:MLHelper = MLHelper()
     
-    predicted_phase = mlHelper.PredictPhase(30, 40)
+    predicted_phase = mlHelper.PredictPhase(31, 48)
     predicted_maturity = mlHelper.PredictMaturity(30, 40)
