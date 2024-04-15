@@ -9,7 +9,7 @@ from ml import *
 
 databaseHelper:DatabaseHelper = DatabaseHelper()
 
-arduinoGenerator = ReadFromArduino(ARDUINO_SENSOR_PORT)
+arduinoGenerator = RPReadFromArduino(ARDUINO_SENSOR_PORT)
 LAST_SYNC_TIME = datetime.now(pytz.utc).replace(tzinfo=None)- timedelta(hours=1)
 
 def ShouldProcessML():
@@ -39,7 +39,7 @@ def StartNewProcess():
             mature_result = 'Immature'
         )
     )
-    StartCompostProcessor()
+    RPStartCompostProcessor()
     return current_process_id
 
 def StopProcess(process_id:str):
@@ -51,7 +51,7 @@ def StopProcess(process_id:str):
         print(f'{process_id} >> Updating Process Data')
         databaseHelper.UpdateProcessData(processData=processData)
 
-    StopCompostProcessor()
+    RPStopCompostProcessor()
     return process_id
 
 def BackgroundProcess():
@@ -64,7 +64,7 @@ def BackgroundProcess():
             time.sleep(60)
             continue
 
-        StartCompostProcessor()
+        RPStartCompostProcessor()
 
         #* Read sensor data from Arduino
         #region Sensor Data
@@ -115,6 +115,8 @@ def BackgroundProcess():
             temperature = sensorData.temperature,
             humidity = sensorData.humidity,
         )
+        #! sometimes i get values above 4. i once got 8
+
         predicted_maturity = mlHelper.PredictMaturity(
             temperature = sensorData.temperature,
             humidity = sensorData.humidity,
@@ -123,7 +125,7 @@ def BackgroundProcess():
 
         processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
 
-        processData.current_phase = predicted_phase
+        processData.current_phase = f'Phase {predicted_phase}'
         processData.mature_result = predicted_maturity
 
         #TODO - decide percentage
@@ -131,3 +133,5 @@ def BackgroundProcess():
         #TODO - process maturity only if phase 4
 
         databaseHelper.UpdateProcessData(processData)
+
+        RPSetProcessorPhase(predicted_phase)
