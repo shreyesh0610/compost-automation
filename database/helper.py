@@ -7,16 +7,34 @@ from utils import *
 
 class DatabaseHelper:
     def __init__(self):
+        print(f'Creating DB at {DATABASE_PATH}')
         self.connection = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 
         self.CreateTablesIfNotExists()
 
     def CreateTablesIfNotExists(self):
         cursor = self.connection.cursor()
+        # cursor.execute('''
+        #     CREATE TABLE IF NOT EXISTS sensor_data
+        #     (
+        #         id INTEGER NOT NULL AUTOINCREMENT,
+        #         process_id TEXT,
+        #         humidity REAL,
+        #         temperature REAL,
+        #         ec REAL,
+        #         ph REAL,
+        #         nitrogen REAL,
+        #         phophorus REAL,
+        #         potassium REAL,
+        #         timestamp DATETIME,
+        #         PRIMARY KEY (id)
+        #     );
+        #     '''
+        # )
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS sensor_data
             (
-                id INTEGER NOT NULL AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 process_id TEXT,
                 humidity REAL,
                 temperature REAL,
@@ -25,22 +43,33 @@ class DatabaseHelper:
                 nitrogen REAL,
                 phophorus REAL,
                 potassium REAL,
-                timestamp DATETIME,
-                PRIMARY KEY (id)
+                timestamp DATETIME
             );
             '''
         )
 
+        # cursor.execute('''
+        #     CREATE TABLE IF NOT EXISTS process_data
+        #     (
+        #         process_id TEXT AUTOINCREMENT,
+        #         start_time DATETIME,
+        #         end_time DATETIME,
+        #         current_phase TEXT,
+        #         mature_percentage REAL,
+        #         mature_result TEXT,
+        #         PRIMARY KEY (process_id)
+        #     );
+        #     '''
+        # )
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS process_data
             (
-                process_id TEXT AUTOINCREMENT,
+                process_id TEXT PRIMARY KEY,
                 start_time DATETIME,
                 end_time DATETIME,
                 current_phase TEXT,
                 mature_percentage REAL,
-                mature_result TEXT,
-                PRIMARY KEY (process_id)
+                mature_result TEXT
             );
             '''
         )

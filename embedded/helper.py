@@ -9,6 +9,7 @@ import RPi.GPIO as GPIO
 
 from utils import *
 
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(PROCESSOR_RUN_PIN_NO, GPIO.OUT)
 GPIO.setup(PROCESSOR_PHASE_PIN_NO_1, GPIO.OUT)

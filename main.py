@@ -116,4 +116,4 @@ async def get_current_process_id():
 if __name__ == '__main__':
     bgTask = BackgroundTasks()
     bgTask.start()
-    uvicorn.run(app, host="0.0.0.0", port=3000)
+    uvicorn.run(app, host="0.0.0.0", port=4000)
