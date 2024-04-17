@@ -1,6 +1,6 @@
 import os
 import sys
-
+import time
 
 from utils import *
 from database import *
@@ -61,7 +61,7 @@ def BackgroundProcess():
             current_process_id:str = GetCurrentProcessID()
             if not current_process_id:
                 print('There is no process in progress currently. Sleeping for 60 seconds')
-                time.sleep(60)
+                time.sleep(1)
                 continue
 
             RPStartCompostProcessor()
@@ -71,22 +71,22 @@ def BackgroundProcess():
             sensor_data_string = next(arduinoGenerator, None)
             if not sensor_data_string:
                 print('No Sensor data found to read')
-                time.sleep(10)
+                time.sleep(1)
                 continue
 
             # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
             sensor_data_string = sensor_data_string.lower().strip()
             if not all([
-                'soil humidity' in sensor_data_string,
-                'soil temperature' in sensor_data_string,
-                'soil conductivity' in sensor_data_string,
-                'soil ph' in sensor_data_string,
-                'soil nitrogen' in sensor_data_string,
-                'soil phosphorus' in sensor_data_string,
-                'soil potassium' in sensor_data_string,
+                'soil humidity:' in sensor_data_string,
+                'soil temperature:' in sensor_data_string,
+                'soil conductivity:' in sensor_data_string,
+                'soil ph:' in sensor_data_string,
+                'soil nitrogen:' in sensor_data_string,
+                'soil phosphorus:' in sensor_data_string,
+                'soil potassium:' in sensor_data_string,
             ]):
                 print(f'{current_process_id} >> Invalid reading string = {sensor_data_string}')
-                time.sleep(60)
+                time.sleep(1)
                 continue
 
             split_data = sensor_data_string.split(',')
@@ -96,7 +96,7 @@ def BackgroundProcess():
 
             if len(split_numbers) != 7:
                 print(f'{current_process_id} >> Sensor values are not equal to 7 = {sensor_data_string}')
-                time.sleep(60)
+                time.sleep(1)
                 continue
 
             sensorData:SensorData = SensorData(
@@ -140,7 +140,7 @@ def BackgroundProcess():
             databaseHelper.UpdateProcessData(processData)
 
             RPSetProcessorPhase(predicted_phase)
-            time.sleep(60)
+            time.sleep(1)
 
         except Exception as ex:
             print(ex)
