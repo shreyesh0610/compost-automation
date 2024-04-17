@@ -81,7 +81,7 @@ class DatabaseHelper:
         cursor = self.connection.cursor()
         cursor.execute('''
                        INSERT INTO sensor_data (process_id, timestamp, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium)
-                    #    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
                        ''',
                        (
                            sensorData.process_id,
