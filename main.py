@@ -9,11 +9,8 @@ app = FastAPI(title='Compost Automation')
 class BackgroundTasks(threading.Thread):
     def run(self,*args,**kwargs):
         while True:
-            pass
-        # if SCRIPT_NAME != 'manager':
-        #     from process import poppy
-        #     poppy([p.strip() for p in PROCESS_FEED_IDS.split(",") if p.strip()])
-        #     killer.crash_it()
+            BackgroundProcess()
+            killer.crash_it()
 
 app.add_middleware(
     CORSMiddleware,

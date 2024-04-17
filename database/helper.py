@@ -7,7 +7,7 @@ from utils import *
 
 class DatabaseHelper:
     def __init__(self):
-        self.connection = sqlite3.connect(DATABASE_PATH)
+        self.connection = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 
         self.CreateTablesIfNotExists()
 

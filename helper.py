@@ -56,82 +56,86 @@ def StopProcess(process_id:str):
 
 def BackgroundProcess():
     while True:
+        try:
+            #* Get current process id
+            current_process_id:str = GetCurrentProcessID()
+            if not current_process_id:
+                print('There is no process in progress currently. Sleeping for 60 seconds')
+                time.sleep(60)
+                continue
 
-        #* Get current process id
-        current_process_id:str = GetCurrentProcessID()
-        if not current_process_id:
-            print('There is no process in progress currently. Sleeping for 60 seconds')
-            time.sleep(60)
-            continue
+            RPStartCompostProcessor()
 
-        RPStartCompostProcessor()
+            #* Read sensor data from Arduino
+            #region Sensor Data
+            sensor_data_string = next(arduinoGenerator, None)
+            if not sensor_data_string.strip(): continue
 
-        #* Read sensor data from Arduino
-        #region Sensor Data
-        sensor_data_string = next(arduinoGenerator, None)
-        if not sensor_data_string.strip(): continue
+            # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
+            sensor_data_string = sensor_data_string.lower().strip()
+            if not all([
+                'soil humidity' in sensor_data_string,
+                'soil temperature' in sensor_data_string,
+                'soil conductivity' in sensor_data_string,
+                'soil ph' in sensor_data_string,
+                'soil nitrogen' in sensor_data_string,
+                'soil phosphorus' in sensor_data_string,
+                'soil potassium' in sensor_data_string,
+            ]):
+                print(f'{current_process_id} >> Invalid reading string = {sensor_data_string}')
+                continue
 
-        # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
-        sensor_data_string = sensor_data_string.lower().strip()
-        if not all([
-            'soil humidity' in sensor_data_string,
-            'soil temperature' in sensor_data_string,
-            'soil conductivity' in sensor_data_string,
-            'soil ph' in sensor_data_string,
-            'soil nitrogen' in sensor_data_string,
-            'soil phosphorus' in sensor_data_string,
-            'soil potassium' in sensor_data_string,
-        ]):
-            print(f'{current_process_id} >> Invalid reading string = {sensor_data_string}')
-            continue
+            split_data = sensor_data_string.split(',')
 
-        split_data = sensor_data_string.split(',')
+            try: split_numbers = [float(sd.split(':')[-1].strip()) for sd in split_data]
+            except: split_numbers = []
 
-        try: split_numbers = [float(sd.split(':')[-1].strip()) for sd in split_data]
-        except: split_numbers = []
+            if len(split_numbers) != 7:
+                print(f'{current_process_id} >> Sensor values are not equal to 7 = {sensor_data_string}')
+                continue
 
-        if len(split_numbers) != 7:
-            print(f'{current_process_id} >> Sensor values are not equal to 7 = {sensor_data_string}')
-            continue
+            sensorData:SensorData = SensorData(
+                process_id = current_process_id,
+                humidity = split_numbers[0],
+                temperature = split_numbers[1],
+                ec = split_numbers[2],
+                ph = split_numbers[3],
+                nitrogen = split_numbers[4],
+                phosphorus = split_numbers[5],
+                potassium = split_numbers[6],
+                timestamp = datetime.now(pytz.utc)
+            )
+            print(f'{current_process_id} >> Inserting sensor data')
+            databaseHelper.InsertSensorData(sensorData=sensorData)
+            #endregion
 
-        sensorData:SensorData = SensorData(
-            process_id = current_process_id,
-            humidity = split_numbers[0],
-            temperature = split_numbers[1],
-            ec = split_numbers[2],
-            ph = split_numbers[3],
-            nitrogen = split_numbers[4],
-            phosphorus = split_numbers[5],
-            potassium = split_numbers[6],
-            timestamp = datetime.now(pytz.utc)
-        )
-        print(f'{current_process_id} >> Inserting sensor data')
-        databaseHelper.InsertSensorData(sensorData=sensorData)
-        #endregion
+            #* ML Model
+            #region ML Model
+            predicted_phase = mlHelper.PredictPhase(
+                temperature = sensorData.temperature,
+                humidity = sensorData.humidity,
+            )
+            #! sometimes i get values above 4. i once got 8
 
-        #* ML Model
-        #region ML Model
-        predicted_phase = mlHelper.PredictPhase(
-            temperature = sensorData.temperature,
-            humidity = sensorData.humidity,
-        )
-        #! sometimes i get values above 4. i once got 8
+            predicted_maturity = mlHelper.PredictMaturity(
+                temperature = sensorData.temperature,
+                humidity = sensorData.humidity,
+            )
+            #endregion
 
-        predicted_maturity = mlHelper.PredictMaturity(
-            temperature = sensorData.temperature,
-            humidity = sensorData.humidity,
-        )
-        #endregion
+            processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
 
-        processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
+            processData.current_phase = f'Phase {predicted_phase}'
+            processData.mature_result = predicted_maturity
 
-        processData.current_phase = f'Phase {predicted_phase}'
-        processData.mature_result = predicted_maturity
+            #TODO - decide percentage
+            #TODO - decide between phase 1 and 3
+            #TODO - process maturity only if phase 4
 
-        #TODO - decide percentage
-        #TODO - decide between phase 1 and 3
-        #TODO - process maturity only if phase 4
+            databaseHelper.UpdateProcessData(processData)
 
-        databaseHelper.UpdateProcessData(processData)
+            RPSetProcessorPhase(predicted_phase)
 
-        RPSetProcessorPhase(predicted_phase)
+        except Exception as ex:
+            print(ex)
+            traceback.print_exc()
