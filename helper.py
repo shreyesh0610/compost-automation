@@ -9,14 +9,13 @@ from ml import *
 
 databaseHelper:DatabaseHelper = DatabaseHelper()
 
-arduinoGenerator = RPReadFromArduino(ARDUINO_SENSOR_PORT)
 LAST_SYNC_TIME = datetime.now(pytz.utc).replace(tzinfo=None)- timedelta(hours=1)
 
 def ShouldProcessML():
     #- function to monitor if its been 1 hour since last ML run
     global LAST_SYNC_TIME
 
-    if LAST_SYNC_TIME < datetime.now(pytz.utc).replace(tzinfo=None) - timedelta(hours=1): 
+    if LAST_SYNC_TIME < datetime.now(pytz.utc).replace(tzinfo=None) - timedelta(hours=1):
         return True
     return False
 
@@ -55,6 +54,7 @@ def StopProcess(process_id:str):
     return process_id
 
 def BackgroundProcess():
+    arduinoGenerator = RPReadFromArduino(ARDUINO_SENSOR_PORT)
     while True:
         try:
             #* Get current process id
@@ -71,7 +71,7 @@ def BackgroundProcess():
             sensor_data_string = next(arduinoGenerator, None)
             if not sensor_data_string:
                 print('No Sensor data found to read')
-                time.sleep(60)
+                time.sleep(10)
                 continue
 
             # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
