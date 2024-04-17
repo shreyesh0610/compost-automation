@@ -68,11 +68,11 @@ def start_process():
     except Exception as ex: raise HTTPException(500, ex)
 
 @app.post("/stop", status_code=200)
-def stop_process():
+def stop_process(process_id:str):
     try:
         if not MOCK_API:
             return {
-                'process_id': StopProcess(),
+                'process_id': StopProcess(process_id),
                 'message': 'Process Stopped'
             }
         else:
@@ -114,6 +114,6 @@ async def get_current_process_id():
 
 
 if __name__ == '__main__':
-    bgTask = BackgroundTasks()
-    bgTask.start()
-    uvicorn.run(app, host="0.0.0.0", port=4000)
+    # bgTask = BackgroundTasks()
+    # bgTask.start()
+    uvicorn.run(app, host="0.0.0.0", port=3000)

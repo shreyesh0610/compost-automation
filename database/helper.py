@@ -41,7 +41,7 @@ class DatabaseHelper:
                 ec REAL,
                 ph REAL,
                 nitrogen REAL,
-                phophorus REAL,
+                phosphorus REAL,
                 potassium REAL,
                 timestamp DATETIME
             );
@@ -124,12 +124,12 @@ class DatabaseHelper:
         cursor = self.connection.cursor()
         cursor.execute('''
                        INSERT INTO process_data (process_id, start_time, end_time, current_phase, mature_percentage, mature_result)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                       VALUES (?, ?, ?, ?, ?, ?);
                        ''',
                        (
                            processData.process_id,
                            convert_datetime_to_string(processData.start_time),
-                           convert_datetime_to_string(processData.end_time),
+                           convert_datetime_to_string(processData.end_time) if processData.end_time else None,
                            processData.current_phase,
                            processData.mature_percentage,
                            processData.mature_result,
