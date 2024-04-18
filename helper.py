@@ -33,20 +33,21 @@ def StartNewProcess():
 
     any_old_process_id:str = GetCurrentProcessID()
 
-    if any_old_process_id: current_process_id = any_old_process_id
-    else: current_process_id = create_process_id()
-
-    print(f'{current_process_id} >> Inserting New Process Data')
-    databaseHelper.InsertProcessData(
-        processData = ProcessData(
-            process_id = current_process_id,
-            start_time = datetime.now(),
-            end_time = None,
-            current_phase = 'Phase 1',
-            mature_percentage = 0,
-            mature_result = 'Immature'
+    if any_old_process_id: 
+        current_process_id = any_old_process_id
+    else: 
+        current_process_id = create_process_id()
+        print(f'{current_process_id} >> Inserting New Process Data')
+        databaseHelper.InsertProcessData(
+            processData = ProcessData(
+                process_id = current_process_id,
+                start_time = datetime.now(),
+                end_time = None,
+                current_phase = 'Phase 1',
+                mature_percentage = 0,
+                mature_result = 'Immature'
+            )
         )
-    )
     RPStartCompostProcessor()
     return current_process_id
 
