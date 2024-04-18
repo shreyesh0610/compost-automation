@@ -34,7 +34,7 @@ def RPStopCompostProcessor():
     GPIO.output(PROCESSOR_RUN_PIN_NO, GPIO.LOW)
 
 def RPSetProcessorPhase(phase_no:int):
-    print('Setting Compost Processor Phase: Phase {phase_no}')
+    print(f'Setting Compost Processor Phase: Phase {phase_no}')
 
     if phase_no == 1: #- 00
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
@@ -51,3 +51,15 @@ def RPSetProcessorPhase(phase_no:int):
     else: #- default 00
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+
+
+if __name__ == '__main__':
+    arduinoGenerator = RPReadFromArduino(ARDUINO_SENSOR_PORT)
+    while True:
+        sensor_data_string = next(arduinoGenerator, None)
+        if not sensor_data_string:
+            print('No Sensor data found to read')
+            time.sleep(1)
+            continue
+
+        print(sensor_data_string)

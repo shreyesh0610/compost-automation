@@ -47,7 +47,7 @@ async def get_sensor_data(process_id:str):
                     nitrogen = random.uniform(1.0,100.0),
                     phosphorus = random.uniform(1.0,100.0),
                     potassium = random.uniform(1.0,100.0),
-                    timestamp = datetime.now(pytz.utc)
+                    timestamp = datetime.now()
                 ).convert_to_dict() for _ in range(random.randint(1,10))]
             }
     except Exception as ex: raise HTTPException(500, ex)
@@ -95,8 +95,8 @@ async def get_process_data(process_id:str):
                 'process_id': process_id,
                 'result' : ProcessData(
                     process_id = 'random_process_id',
-                    start_time = datetime.now(pytz.utc) - timedelta(hours=2),
-                    end_time = datetime.now(pytz.utc),
+                    start_time = datetime.now() - timedelta(hours=2),
+                    end_time = datetime.now(),
                     current_phase = 'Phase 1',
                     mature_percentage = 67.5,
                     mature_result = 'Immature'

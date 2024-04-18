@@ -149,7 +149,7 @@ class DatabaseHelper:
                     WHERE process_id = ?;
                     ''',
                     (
-                        convert_datetime_to_string(processData.end_time),
+                        convert_datetime_to_string(processData.end_time) if processData.end_time else None,
                         processData.current_phase,
                         processData.mature_percentage,
                         processData.mature_result,
@@ -169,8 +169,8 @@ class DatabaseHelper:
         for row in rows:
             processData:ProcessData = ProcessData(
                 process_id = row[0],
-                start_time = row[1],
-                end_time = row[2],
+                start_time = convert_string_to_datetime(row[1]) if row[1] else None,
+                end_time = convert_string_to_datetime(row[2]) if row[2] else None,
                 current_phase = row[3],
                 mature_percentage = row[4],
                 mature_result = row[5]

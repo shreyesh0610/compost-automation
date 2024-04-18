@@ -8,14 +8,16 @@ from embedded import *
 from ml import *
 
 databaseHelper:DatabaseHelper = DatabaseHelper()
+mlHelper:MLHelper = MLHelper()
 
-LAST_SYNC_TIME = datetime.now(pytz.utc).replace(tzinfo=None)- timedelta(hours=1)
+LAST_SYNC_TIME = datetime.now().replace(tzinfo=None)- timedelta(hours=1) #- already settinb one hour behind so it runs for the first time at the start of the code
 
 def ShouldProcessML():
     #- function to monitor if its been 1 hour since last ML run
     global LAST_SYNC_TIME
 
-    if LAST_SYNC_TIME < datetime.now(pytz.utc).replace(tzinfo=None) - timedelta(hours=1):
+    # if LAST_SYNC_TIME < datetime.now().replace(tzinfo=None) - timedelta(hours=1):   #- will only run once per hour
+    if LAST_SYNC_TIME < datetime.now().replace(tzinfo=None) - timedelta(minutes=1): #- will only run once per min
         return True
     return False
 
@@ -31,7 +33,7 @@ def StartNewProcess():
     databaseHelper.InsertProcessData(
         processData = ProcessData(
             process_id = current_process_id,
-            start_time = datetime.now(pytz.utc),
+            start_time = datetime.now(),
             end_time = None,
             current_phase = 'Phase 1',
             mature_percentage = 0,
@@ -46,7 +48,7 @@ def StopProcess(process_id:str):
 
     processData:ProcessData = databaseHelper.GetProcessData(process_id = process_id)
     if processData:
-        processData.end_time = datetime.now(pytz.utc)
+        processData.end_time = datetime.now()
         print(f'{process_id} >> Updating Process Data')
         databaseHelper.UpdateProcessData(processData=processData)
 
@@ -60,7 +62,7 @@ def BackgroundProcess():
             #* Get current process id
             current_process_id:str = GetCurrentProcessID()
             if not current_process_id:
-                print('There is no process in progress currently. Sleeping for 60 seconds')
+                print('There is no process in progress currently. Sleeping for 1 second')
                 time.sleep(1)
                 continue
 
@@ -108,7 +110,7 @@ def BackgroundProcess():
                 nitrogen = split_numbers[4],
                 phosphorus = split_numbers[5],
                 potassium = split_numbers[6],
-                timestamp = datetime.now(pytz.utc)
+                timestamp = datetime.now()
             )
             print(f'{current_process_id} >> Inserting sensor data')
             databaseHelper.InsertSensorData(sensorData=sensorData)
@@ -120,7 +122,7 @@ def BackgroundProcess():
                 temperature = sensorData.temperature,
                 humidity = sensorData.humidity,
             )
-            #! sometimes i get values above 4. i once got 8
+            #! sometimes i get values above 4. i once got 8, 18 -- weird values coming here. need to fix ML model
 
             predicted_maturity = mlHelper.PredictMaturity(
                 temperature = sensorData.temperature,
@@ -145,3 +147,7 @@ def BackgroundProcess():
         except Exception as ex:
             print(ex)
             traceback.print_exc()
+
+
+if __name__ == '__main__':
+    BackgroundProcess()
