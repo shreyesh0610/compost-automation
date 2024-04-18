@@ -27,7 +27,14 @@ def GetCurrentProcessID():
 
 def StartNewProcess():
     print('Starting New Process')
-    current_process_id = create_process_id()
+
+    #- If a process is already going on, do not create another process.
+    #- return the ongoing process ID
+
+    any_old_process_id:str = GetCurrentProcessID()
+
+    if any_old_process_id: current_process_id = any_old_process_id
+    else: current_process_id = create_process_id()
 
     print(f'{current_process_id} >> Inserting New Process Data')
     databaseHelper.InsertProcessData(
