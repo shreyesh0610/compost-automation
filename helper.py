@@ -37,6 +37,7 @@ def StartNewProcess():
         current_process_id = any_old_process_id
     else: 
         current_process_id = create_process_id()
+
         print(f'{current_process_id} >> Inserting New Process Data')
         databaseHelper.InsertProcessData(
             processData = ProcessData(

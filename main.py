@@ -28,12 +28,12 @@ def exception_handler(request: Request, exc: Exception):
     )
 
 @app.get("/data/sensor", status_code=200)
-async def get_sensor_data(process_id:str):
+async def get_sensor_data(process_id:str, only_one:bool=True):
     try:
         if not MOCK_API:
             return {
                 'process_id': process_id,
-                'results': [sD.convert_to_dict() for sD in databaseHelper.GetSensorData(process_id=process_id)]
+                'results': [sD.convert_to_dict() for sD in databaseHelper.GetSensorData(process_id=process_id, only_one=only_one)]
             }
         else:
             return {

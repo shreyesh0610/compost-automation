@@ -59,7 +59,7 @@ class ProcessData:
         return {
             'process_id': self.process_id,
             'start_time': convert_datetime_to_string(self.start_time),
-            'end_time': convert_datetime_to_string(self.end_time),
+            'end_time': convert_datetime_to_string(self.end_time) if self.end_time else None,
             'current_phase': self.current_phase,
             'mature_percentage': self.mature_percentage,
             'mature_result': self.mature_result

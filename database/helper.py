@@ -98,11 +98,12 @@ class DatabaseHelper:
         self.connection.commit()
         cursor.close()
 
-    def GetSensorData(self, process_id:str):
+    def GetSensorData(self, process_id:str, only_one:bool=True):
         sensorDataList:List[SensorData] = []
 
         cursor = self.connection.cursor()
-        cursor.execute("SELECT process_id, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium, timestamp FROM sensor_data WHERE process_id = ?", (process_id,))
+        if only_one: cursor.execute("SELECT process_id, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium, timestamp FROM sensor_data WHERE process_id = ? ORDER BY timestamp DESC LIMIT 1", (process_id,))
+        else: cursor.execute("SELECT process_id, humidity, temperature, ec, ph, nitrogen, phosphorus, potassium, timestamp FROM sensor_data WHERE process_id = ?", (process_id,))
 
         rows = cursor.fetchall()
         for row in rows:
