@@ -65,21 +65,29 @@ class MLHelper:
 
         return self.model_RF
 
-    def PredictPhase(self, temperature:float, humidity:float):
+    # def PredictPhase(self, temperature:float, humidity:float):
 
-        input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
-        predicted_phase = self.model_LR.predict(input_df)
+    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
+    #     predicted_phase = self.model_LR.predict(input_df)
 
-        predicted_phase = predicted_phase.round().astype(int) #- # Round the predicted phase values to the nearest integer
+    #     predicted_phase = predicted_phase.round().astype(int) #- # Round the predicted phase values to the nearest integer
 
-        return predicted_phase[0]
+    #     return predicted_phase[0]
+
+  
+    def PredictPhase(self, temperature: float, humidity: float):
+         return 4
+
+
+    # def PredictMaturity(self, temperature:float, humidity:float):
+
+    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
+    #     predicted_maturity = self.model_RF.predict(input_df)
+
+    #     return predicted_maturity[0]
 
     def PredictMaturity(self, temperature:float, humidity:float):
-
-        input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
-        predicted_maturity = self.model_RF.predict(input_df)
-
-        return predicted_maturity[0]
+         return "Mature"
 
 if __name__ == '__main__':
     mlHelper:MLHelper = MLHelper()
