@@ -86,9 +86,10 @@ def stop_process(process_id:str):
 async def get_process_data(process_id:str):
     try:
         if not MOCK_API:
+            processData:ProcessData = databaseHelper.GetProcessData(process_id = process_id)
             return {
                 'process_id': process_id,
-                'result': databaseHelper.GetProcessData(process_id = process_id).convert_to_dict()
+                'result': processData.convert_to_dict() if processData else {}
             }
         else:
             return {
