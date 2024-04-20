@@ -53,12 +53,12 @@ async def get_sensor_data(process_id:str, only_one:bool=True):
     except Exception as ex: raise HTTPException(500, ex)
 
 @app.get("/data/history", status_code=200)
-async def get_sensor_history(process_id_list:List[str]=[]):
+async def get_sensor_history():
     return_list = []
     try:
         if not MOCK_API:
 
-            if not process_id_list: process_id_list = databaseHelper.GetCollectProcessIDs()
+            process_id_list = databaseHelper.GetCollectProcessIDs()
             for process_id in process_id_list:
 
                 sensorDataList:List[SensorData] = databaseHelper.GetSensorData(process_id=process_id, only_one=True)

@@ -48,7 +48,7 @@ class DatabaseHelper:
             CREATE TABLE IF NOT EXISTS collect_process_data
             (
                 process_id TEXT PRIMARY KEY,
-                collect_time DATETIME,
+                collect_time DATETIME
             );
             '''
         )
