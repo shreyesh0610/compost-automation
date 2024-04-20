@@ -21,7 +21,7 @@ class MLHelper:
         # /workspaces/compost-automation/ml/dataset.xlsx
 
         #- Train Models
-        self.model_LR_phase = self.TrainLRModelForPhase()
+        # self.model_LR_phase = self.TrainLRModelForPhase()
         self.model_RF_phase = self.TrainRFModelForPhase()
         self.model_RF_maturity = self.TrainRFModelForMaturity()
 
