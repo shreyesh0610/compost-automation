@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(dirname(__file__), os.pardir)))
 from typing import List,Dict
 
 # CURRENT_DIRECTORY = os.getenv("CURRENT_DIRECTORY", f"{os.getcwd()}")
-CURRENT_DIRECTORY = os.getenv("CURRENT_DIRECTORY", '/home/admin/Desktop/test-compostifAI/compostifAI_2024/compost-automation')
+CURRENT_DIRECTORY = os.getenv("CURRENT_DIRECTORY", '/home/admin/Desktop/test-compostifAI/compost-automation')
 
 DEBUGGING = True if os.getenv('DEBUGGING') and str(os.getenv('DEBUGGING')).upper() == 'TRUE' else False
 MOCK_API = True if os.getenv('MOCK_API') and str(os.getenv('MOCK_API')).upper() == 'TRUE' else False
