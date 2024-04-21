@@ -14,23 +14,6 @@ class DatabaseHelper:
 
     def CreateTablesIfNotExists(self):
         cursor = self.connection.cursor()
-        # cursor.execute('''
-        #     CREATE TABLE IF NOT EXISTS sensor_data
-        #     (
-        #         id INTEGER NOT NULL AUTOINCREMENT,
-        #         process_id TEXT,
-        #         humidity REAL,
-        #         temperature REAL,
-        #         ec REAL,
-        #         ph REAL,
-        #         nitrogen REAL,
-        #         phophorus REAL,
-        #         potassium REAL,
-        #         timestamp DATETIME,
-        #         PRIMARY KEY (id)
-        #     );
-        #     '''
-        # )
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS sensor_data
             (
@@ -48,19 +31,6 @@ class DatabaseHelper:
             '''
         )
 
-        # cursor.execute('''
-        #     CREATE TABLE IF NOT EXISTS process_data
-        #     (
-        #         process_id TEXT AUTOINCREMENT,
-        #         start_time DATETIME,
-        #         end_time DATETIME,
-        #         current_phase TEXT,
-        #         mature_percentage REAL,
-        #         mature_result TEXT,
-        #         PRIMARY KEY (process_id)
-        #     );
-        #     '''
-        # )
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS process_data
             (
@@ -70,6 +40,15 @@ class DatabaseHelper:
                 current_phase TEXT,
                 mature_percentage REAL,
                 mature_result TEXT
+            );
+            '''
+        )
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS collect_process_data
+            (
+                process_id TEXT PRIMARY KEY,
+                collect_time DATETIME,
             );
             '''
         )
@@ -199,6 +178,33 @@ class DatabaseHelper:
             break #- only 1
         cursor.close()
         return processData
+
+    def InsertCollectProcess(self, process_id:str, collect_time:datetime = datetime.now()):
+        cursor = self.connection.cursor()
+        cursor.execute('''
+                       INSERT INTO collect_process_data (process_id, collect_time)
+                       VALUES (?, ?);
+                       ''',
+                       (
+                           process_id,
+                           convert_datetime_to_string(collect_time),
+                       )
+        )
+        self.connection.commit()
+        cursor.close()
+        return process_id
+
+    def GetCollectProcessIDs(self):
+        process_id_list:List[str] = []
+
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT process_id FROM collect_process_data ORDER BY collect_time DESC;")
+
+        rows = cursor.fetchall()
+        for row in rows:
+            process_id_list.append(row[0])
+        cursor.close()
+        return process_id_list
 
 if __name__ == '__main__':
     databaseHelper:DatabaseHelper = DatabaseHelper()

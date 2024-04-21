@@ -52,6 +52,52 @@ async def get_sensor_data(process_id:str, only_one:bool=True):
             }
     except Exception as ex: raise HTTPException(500, ex)
 
+@app.get("/data/history", status_code=200)
+async def get_sensor_history(process_id_list:List[str]=[]):
+    return_list = []
+    try:
+        if not MOCK_API:
+
+            if not process_id_list: process_id_list = databaseHelper.GetCollectProcessIDs()
+            for process_id in process_id_list:
+
+                sensorDataList:List[SensorData] = databaseHelper.GetSensorData(process_id=process_id, only_one=True)
+                sensorData = sensorDataList[0] if sensorDataList else None
+
+                if sensorData:
+                    return_list.append({
+                        'process_id': process_id,
+                        'result': sensorData.convert_to_dict()
+                    })
+                else:
+                    return_list.append({
+                        'process_id': process_id,
+                        'result': None
+                    })
+            return {
+                'results': return_list
+            }
+        else:
+            return {
+                'results': [
+                    {
+                        'process_id': process_id,
+                        'result' : SensorData(
+                            process_id = process_id,
+                            humidity = random.uniform(1.0,100.0),
+                            temperature = random.uniform(1.0,100.0),
+                            ec = random.uniform(1.0,100.0),
+                            ph = random.uniform(1.0,100.0),
+                            nitrogen = random.uniform(1.0,100.0),
+                            phosphorus = random.uniform(1.0,100.0),
+                            potassium = random.uniform(1.0,100.0),
+                            timestamp = datetime.now()
+                        )
+                    }
+                ]
+            }
+    except Exception as ex: raise HTTPException(500, ex)
+
 @app.post("/start", status_code=200)
 def start_process():
     try:
@@ -79,6 +125,21 @@ def stop_process(process_id:str):
             return {
                 'process_id' : create_process_id(),
                 'message': 'Process Stopped'
+            }
+    except Exception as ex: raise HTTPException(500, ex)
+
+@app.post("/collect", status_code=200)
+def collect_process(process_id:str):
+    try:
+        if not MOCK_API:
+            return {
+                'process_id': CollectProcess(process_id),
+                'message': 'Process Collected/Saved'
+            }
+        else:
+            return {
+                'process_id' : process_id,
+                'message': 'Process Collected/Saved'
             }
     except Exception as ex: raise HTTPException(500, ex)
 

@@ -21,6 +21,9 @@ def ShouldProcessML():
         return True
     return False
 
+def CollectProcess(process_id):
+    return databaseHelper.InsertCollectProcess(process_id)
+
 def GetCurrentProcessID():
     processData:ProcessData = databaseHelper.GetCurrentProcess()
     return processData.process_id if processData else ''
