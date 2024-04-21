@@ -79,6 +79,13 @@ class MLHelper:
         self.model_RF_maturity.fit(X_forest, y_forest)
 
         return self.model_RF_maturity
+    
+    # Hardcoded prediction prediction
+    # def PredictPhase(self, temperature: float, humidity: float):
+    # Assuming `self.model_RF_phase` is the model used for prediction
+        # predicted_phase = 4
+
+        # return predicted_phase
 
     def PredictPhase(self, temperature:float, humidity:float):
 
@@ -91,6 +98,14 @@ class MLHelper:
         predicted_phase = predicted_phase.round().astype(int)
 
         return predicted_phase[0]
+
+
+     # Hardcoded prediction maturity
+    # def PredictMaturity(self, temperature:float, humidity:float):
+    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
+    #     predicted_maturity = self.model_RF_maturity.predict(input_df)
+
+    #     return "Mature"
 
     def PredictMaturity(self, temperature:float, humidity:float):
 
