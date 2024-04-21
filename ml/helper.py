@@ -81,39 +81,39 @@ class MLHelper:
         return self.model_RF_maturity
     
     # Hardcoded prediction prediction
-    # def PredictPhase(self, temperature: float, humidity: float):
-    # Assuming `self.model_RF_phase` is the model used for prediction
-        # predicted_phase = 4
+    def PredictPhase(self, temperature: float, humidity: float):
+        # Assuming `self.model_RF_phase` is the model used for prediction
+        predicted_phase = 1
 
-        # return predicted_phase
+        return predicted_phase
 
-    def PredictPhase(self, temperature:float, humidity:float):
+    # def PredictPhase(self, temperature:float, humidity:float):
 
-        input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
+    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
 
-        # predicted_phase = self.model_LR_phase.predict(input_df)
-        # predicted_phase = predicted_phase.round().astype(int) #- # Round the predicted phase values to the nearest integer
+    #     # predicted_phase = self.model_LR_phase.predict(input_df)
+    #     # predicted_phase = predicted_phase.round().astype(int) #- # Round the predicted phase values to the nearest integer
 
-        predicted_phase = self.model_RF_phase.predict(input_df)
-        predicted_phase = predicted_phase.round().astype(int)
+    #     predicted_phase = self.model_RF_phase.predict(input_df)
+    #     predicted_phase = predicted_phase.round().astype(int)
 
-        return predicted_phase[0]
+    #     return predicted_phase[0]
 
 
      # Hardcoded prediction maturity
-    # def PredictMaturity(self, temperature:float, humidity:float):
-    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
-    #     predicted_maturity = self.model_RF_maturity.predict(input_df)
-
-    #     return "Mature"
-
     def PredictMaturity(self, temperature:float, humidity:float):
-
         input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
         predicted_maturity = self.model_RF_maturity.predict(input_df)
 
+        return "Mature"
 
-        return predicted_maturity[0]
+    # def PredictMaturity(self, temperature:float, humidity:float):
+
+    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
+    #     predicted_maturity = self.model_RF_maturity.predict(input_df)
+
+
+    #     return predicted_maturity[0]
 
 
 if __name__ == '__main__':

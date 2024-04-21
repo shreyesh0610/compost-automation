@@ -36,21 +36,27 @@ def RPStopCompostProcessor():
 def RPSetProcessorPhase(phase_no:int):
     print(f'Setting Compost Processor Phase: Phase {phase_no}')
 
-    if phase_no == 1: #- 00
+    if phase_no == 0: # No current phases detected
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
+        GPIO.output(PROCESSOR_RUN_PIN_NO, GPIO.LOW)
+    elif phase_no == 1: #- 00
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
     elif phase_no == 2: #- 01
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.HIGH)
     elif phase_no == 3: #- 10
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
     elif phase_no == 4: #- 11
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.HIGH)
     else: #- default 00
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
+        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
+
+
 
 
 if __name__ == '__main__':
