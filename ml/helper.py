@@ -21,18 +21,19 @@ class MLHelper:
         # /workspaces/compost-automation/ml/dataset.xlsx
 
         #- Train Models
-        self.model_LR = self.TrainLRModel()
-        self.model_RF = self.TrainRFModel()
+        self.model_LR_phase = self.TrainLRModelForPhase()
+        self.model_RF_phase = self.TrainRFModelForPhase()
+        self.model_RF_maturity = self.TrainRFModelForMaturity()
 
     def ReadDatasetToDF(self):
         #- Load data from Excel file with different sheets
         self.dataset_df = pd.read_excel(
-            io = DATASET_EXCEL_PATH, 
+            io = DATASET_EXCEL_PATH,
             sheet_name = [LR_SHEET_NAME, RF_SHEET_NAME]
         )
         return self.dataset_df
 
-    def TrainLRModel(self):
+    def TrainLRModelForPhase(self):
         #- Check column names of the Linear Regression sheet
         lr_df:pd.DataFrame = self.dataset_df[LR_SHEET_NAME]
 
@@ -46,12 +47,26 @@ class MLHelper:
         X_linear = lr_df[['Temperature', 'Humidity']]
         Y_linear = lr_df['Phase']
 
-        self.model_LR = LinearRegression()
-        self.model_LR.fit(X_linear, Y_linear)
+        self.model_LR_phase = LinearRegression()
+        self.model_LR_phase.fit(X_linear, Y_linear)
 
-        return self.model_LR
+        return self.model_LR_phase
 
-    def TrainRFModel(self):
+    def TrainRFModelForPhase(self):
+        #- Check column names of Random Forest sheet
+        rf_df:pd.DataFrame = self.dataset_df[LR_SHEET_NAME]
+        rf_df.columns = rf_df.columns.str.strip()
+        print("RF Data Columns:", rf_df.columns)
+
+        #- Train Random Forest Classifier
+        X_forest = rf_df[['Temperature', 'Humidity']]
+        y_forest = rf_df['Phase']
+        self.model_RF_phase = RandomForestClassifier()
+        self.model_RF_phase.fit(X_forest, y_forest)
+
+        return self.model_RF_phase
+
+    def TrainRFModelForMaturity(self):
         #- Check column names of Random Forest sheet
         rf_df:pd.DataFrame = self.dataset_df[RF_SHEET_NAME]
         rf_df.columns = rf_df.columns.str.strip()
@@ -60,37 +75,34 @@ class MLHelper:
         #- Train Random Forest Classifier
         X_forest = rf_df[['Temperature', 'Humidity']]
         y_forest = rf_df['Maturity']
-        self.model_RF = RandomForestClassifier()
-        self.model_RF.fit(X_forest, y_forest)
+        self.model_RF_maturity = RandomForestClassifier()
+        self.model_RF_maturity.fit(X_forest, y_forest)
 
-        return self.model_RF
+        return self.model_RF_maturity
 
-    # def PredictPhase(self, temperature:float, humidity:float):
+    def PredictPhase(self, temperature:float, humidity:float):
 
-    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
-    #     predicted_phase = self.model_LR.predict(input_df)
+        input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
 
-    #     predicted_phase = predicted_phase.round().astype(int) #- # Round the predicted phase values to the nearest integer
+        # predicted_phase = self.model_LR_phase.predict(input_df)
+        # predicted_phase = predicted_phase.round().astype(int) #- # Round the predicted phase values to the nearest integer
 
-    #     return predicted_phase[0]
+        predicted_phase = self.model_RF_phase.predict(input_df)
+        predicted_phase = predicted_phase.round().astype(int)
 
-  
-    def PredictPhase(self, temperature: float, humidity: float):
-         return 4
-
-
-    # def PredictMaturity(self, temperature:float, humidity:float):
-
-    #     input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
-    #     predicted_maturity = self.model_RF.predict(input_df)
-
-    #     return predicted_maturity[0]
+        return predicted_phase[0]
 
     def PredictMaturity(self, temperature:float, humidity:float):
-         return "Mature"
+
+        input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
+        predicted_maturity = self.model_RF_maturity.predict(input_df)
+
+
+        return predicted_maturity[0]
+
 
 if __name__ == '__main__':
     mlHelper:MLHelper = MLHelper()
-    
+
     predicted_phase = mlHelper.PredictPhase(31, 48)
     predicted_maturity = mlHelper.PredictMaturity(30, 40)
