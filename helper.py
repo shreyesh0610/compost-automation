@@ -145,11 +145,7 @@ def BackgroundProcess():
             processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
 
             processData.current_phase = f'Phase {predicted_phase}'
-            processData.mature_result = predicted_maturity
-
-            #TODO - decide percentage
-            #TODO - decide between phase 1 and 3
-            #TODO - process maturity only if phase 4
+            processData.mature_result = predicted_maturity if processData.mature_result != "Mature" else processData.mature_result
 
             databaseHelper.UpdateProcessData(processData)
 

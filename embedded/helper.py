@@ -39,7 +39,6 @@ def RPSetProcessorPhase(phase_no:int):
     if phase_no == 0: # No current phases detected
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
         GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
-        GPIO.output(PROCESSOR_RUN_PIN_NO, GPIO.LOW)
     elif phase_no == 1: #- 00
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
         GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
@@ -55,8 +54,6 @@ def RPSetProcessorPhase(phase_no:int):
     else: #- default 00
         GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
         GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
-
-
 
 
 if __name__ == '__main__':
