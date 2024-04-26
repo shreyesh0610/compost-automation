@@ -74,8 +74,8 @@ def BackgroundProcess():
             #* Get current process id
             current_process_id:str = GetCurrentProcessID()
             if not current_process_id:
-                print('There is no process in progress currently. Sleeping for 1 second')
-                time.sleep(10)
+                print('There is no process in progress currently. Sleeping for 2 mins')
+                time.sleep(120)
                 continue
 
             RPStartCompostProcessor()
@@ -85,7 +85,7 @@ def BackgroundProcess():
             sensor_data_string = next(arduinoGenerator, None)
             if not sensor_data_string:
                 print('No Sensor data found to read')
-                time.sleep(10)
+                time.sleep(120)
                 continue
 
             # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
@@ -100,7 +100,7 @@ def BackgroundProcess():
                 'soil potassium:' in sensor_data_string,
             ]):
                 print(f'{current_process_id} >> Invalid reading string = {sensor_data_string}')
-                time.sleep(10)
+                time.sleep(120)
                 continue
 
             split_data = sensor_data_string.split(',')
@@ -110,7 +110,7 @@ def BackgroundProcess():
 
             if len(split_numbers) != 7:
                 print(f'{current_process_id} >> Sensor values are not equal to 7 = {sensor_data_string}')
-                time.sleep(10)
+                time.sleep(120)
                 continue
 
             sensorData:SensorData = SensorData(
@@ -154,7 +154,7 @@ def BackgroundProcess():
             databaseHelper.UpdateProcessData(processData)
 
             RPSetProcessorPhase(predicted_phase)
-            time.sleep(10)
+            time.sleep(120)
 
         except Exception as ex:
             print(ex)

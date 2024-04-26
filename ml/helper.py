@@ -80,10 +80,10 @@ class MLHelper:
 
         return self.model_RF_maturity
     
-    # Hardcoded prediction prediction
+    # ! Hardcoded prediction prediction
     def PredictPhase(self, temperature: float, humidity: float):
         # Assuming `self.model_RF_phase` is the model used for prediction
-        predicted_phase = 1
+        predicted_phase = 3
 
         return predicted_phase
 
@@ -100,7 +100,7 @@ class MLHelper:
     #     return predicted_phase[0]
 
 
-     # Hardcoded prediction maturity
+    #  # Hardcoded prediction maturity
     def PredictMaturity(self, temperature:float, humidity:float):
         input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity]})
         predicted_maturity = self.model_RF_maturity.predict(input_df)
