@@ -147,6 +147,7 @@ def BackgroundProcess():
             try: old_phase = int(processData.current_phase.split('Phase')[1].strip())
             except: old_phase = 0
             predicted_phase = predicted_phase if predicted_phase >= old_phase else old_phase
+            # ----------
 
             processData.current_phase = f'Phase {predicted_phase}'
             processData.mature_result = predicted_maturity if processData.mature_result != "Mature" else processData.mature_result
