@@ -134,7 +134,6 @@ def BackgroundProcess():
                 temperature = sensorData.temperature,
                 humidity = sensorData.humidity,
             )
-            #! sometimes i get values above 4. i once got 8, 18 -- weird values coming here. need to fix ML model
 
             predicted_maturity = mlHelper.PredictMaturity(
                 temperature = sensorData.temperature,
@@ -143,6 +142,11 @@ def BackgroundProcess():
             #endregion
 
             processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
+
+            # - logic to not let phase go backward
+            try: old_phase = int(processData.current_phase.split('Phase')[1].strip())
+            except: old_phase = 0
+            predicted_phase = predicted_phase if predicted_phase >= old_phase else old_phase
 
             processData.current_phase = f'Phase {predicted_phase}'
             processData.mature_result = predicted_maturity if processData.mature_result != "Mature" else processData.mature_result
