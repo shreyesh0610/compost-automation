@@ -5,15 +5,15 @@ sys.path.append(os.path.abspath(os.path.join(dirname(__file__), os.pardir)))
 
 import serial
 import sys
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 from utils import *
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(PROCESSOR_RUN_PIN_NO, GPIO.OUT)
-GPIO.setup(PROCESSOR_PHASE_PIN_NO_1, GPIO.OUT)
-GPIO.setup(PROCESSOR_PHASE_PIN_NO_2, GPIO.OUT)
+#GPIO.setwarnings(False)
+#GPIO.setmode(#GPIO.BCM)
+#GPIO.setup(PROCESSOR_RUN_PIN_NO, #GPIO.OUT)
+#GPIO.setup(PROCESSOR_PHASE_PIN_NO_1, #GPIO.OUT)
+#GPIO.setup(PROCESSOR_PHASE_PIN_NO_2, #GPIO.OUT)
 
 
 def RPReadFromArduino(serial_port:str):
@@ -27,33 +27,33 @@ def RPReadFromArduino(serial_port:str):
 
 def RPStartCompostProcessor():
     print('Set Compost Processor - High')
-    GPIO.output(PROCESSOR_RUN_PIN_NO, GPIO.HIGH)
+    #GPIO.output(PROCESSOR_RUN_PIN_NO, #GPIO.HIGH)
 
 def RPStopCompostProcessor():
     print('Set Compost Processor - Low')
-    GPIO.output(PROCESSOR_RUN_PIN_NO, GPIO.LOW)
+    #GPIO.output(PROCESSOR_RUN_PIN_NO, #GPIO.LOW)
 
 def RPSetProcessorPhase(phase_no:int):
     print(f'Setting Compost Processor Phase: Phase {phase_no}')
 
-    if phase_no == 0: # No current phases detected
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
-    elif phase_no == 1: #- 00
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
-    elif phase_no == 2: #- 01
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.HIGH)
-    elif phase_no == 3: #- 10
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
-    elif phase_no == 4: #- 11
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.HIGH)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.HIGH)
-    else: #- default 00
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_1, GPIO.LOW)
-        GPIO.output(PROCESSOR_PHASE_PIN_NO_2, GPIO.LOW)
+    # if phase_no == 0: # No current phases detected
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_1, #GPIO.LOW)
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_2, #GPIO.LOW)
+    # elif phase_no == 1: #- 00
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_1, #GPIO.LOW)
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_2, #GPIO.LOW)
+    # elif phase_no == 2: #- 01
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_1, #GPIO.LOW)
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_2, #GPIO.HIGH)
+    # elif phase_no == 3: #- 10
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_1, #GPIO.HIGH)
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_2, #GPIO.LOW)
+    # elif phase_no == 4: #- 11
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_1, #GPIO.HIGH)
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_2, #GPIO.HIGH)
+    # else: #- default 00
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_1, #GPIO.LOW)
+    #     #GPIO.output(PROCESSOR_PHASE_PIN_NO_2, #GPIO.LOW)
 
 
 if __name__ == '__main__':

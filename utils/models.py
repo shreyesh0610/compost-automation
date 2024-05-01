@@ -45,7 +45,8 @@ class ProcessData:
                 end_time:datetime,
                 current_phase:str,
                 mature_percentage:float,
-                mature_result:str
+                mature_result:str,
+                is_mature_process:bool=False
     ):
 
         self.process_id = process_id
@@ -54,6 +55,7 @@ class ProcessData:
         self.current_phase = current_phase
         self.mature_percentage = mature_percentage
         self.mature_result = mature_result
+        self.is_mature_process = is_mature_process
 
     def convert_to_dict(self):
         return {
@@ -62,5 +64,6 @@ class ProcessData:
             'end_time': convert_datetime_to_string(self.end_time) if self.end_time else None,
             'current_phase': self.current_phase,
             'mature_percentage': self.mature_percentage,
-            'mature_result': self.mature_result
+            'mature_result': self.mature_result,
+            'is_mature_process': self.is_mature_process
         }

@@ -39,10 +39,18 @@ class DatabaseHelper:
                 end_time DATETIME,
                 current_phase TEXT,
                 mature_percentage REAL,
-                mature_result TEXT
+                mature_result TEXT,
+                is_mature_process INTEGER
             );
             '''
         )
+
+        #- Check if the column exists
+        cursor.execute("PRAGMA table_info(process_data)")
+        columns = [column[1] for column in cursor.fetchall()]
+        if 'is_mature_process' not in columns:
+            cursor.execute("ALTER TABLE process_data ADD COLUMN is_mature_process INTEGER DEFAULT 0")
+
 
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS collect_process_data
@@ -103,8 +111,8 @@ class DatabaseHelper:
     def InsertProcessData(self, processData:ProcessData):
         cursor = self.connection.cursor()
         cursor.execute('''
-                       INSERT INTO process_data (process_id, start_time, end_time, current_phase, mature_percentage, mature_result)
-                       VALUES (?, ?, ?, ?, ?, ?);
+                       INSERT INTO process_data (process_id, start_time, end_time, current_phase, mature_percentage, mature_result, is_mature_process)
+                       VALUES (?, ?, ?, ?, ?, ?, ?);
                        ''',
                        (
                            processData.process_id,
@@ -113,6 +121,7 @@ class DatabaseHelper:
                            processData.current_phase,
                            processData.mature_percentage,
                            processData.mature_result,
+                           1 if processData.is_mature_process else 0
                        )
         )
         self.connection.commit()
@@ -143,7 +152,7 @@ class DatabaseHelper:
         processData:ProcessData = None
 
         cursor = self.connection.cursor()
-        cursor.execute("SELECT process_id, start_time, end_time, current_phase, mature_percentage, mature_result FROM process_data WHERE process_id = ?", (process_id,))
+        cursor.execute("SELECT process_id, start_time, end_time, current_phase, mature_percentage, mature_result, is_mature_process FROM process_data WHERE process_id = ?", (process_id,))
 
         rows = cursor.fetchall()
         for row in rows:
@@ -153,7 +162,8 @@ class DatabaseHelper:
                 end_time = convert_string_to_datetime(row[2]) if row[2] else None,
                 current_phase = row[3],
                 mature_percentage = row[4],
-                mature_result = row[5]
+                mature_result = row[5],
+                is_mature_process = True if row[6] else False
             )
             break #- only 1
         cursor.close()
@@ -163,7 +173,7 @@ class DatabaseHelper:
         processData:ProcessData = None
 
         cursor = self.connection.cursor()
-        cursor.execute("SELECT process_id, start_time, end_time, current_phase, mature_percentage, mature_result FROM process_data WHERE end_time IS NULL ORDER BY start_time DESC")
+        cursor.execute("SELECT process_id, start_time, end_time, current_phase, mature_percentage, mature_result, is_mature_process FROM process_data WHERE end_time IS NULL ORDER BY start_time DESC")
 
         rows = cursor.fetchall()
         for row in rows:
@@ -173,7 +183,8 @@ class DatabaseHelper:
                 end_time = row[2],
                 current_phase = row[3],
                 mature_percentage = row[4],
-                mature_result = row[5]
+                mature_result = row[5],
+                is_mature_process = True if row[6] else False
             )
             break #- only 1
         cursor.close()

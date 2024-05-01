@@ -79,7 +79,7 @@ class MLHelper:
         self.model_RF_maturity.fit(X_forest, y_forest)
 
         return self.model_RF_maturity
-    
+
     # ! Hardcoded prediction prediction
     def PredictPhase(self, temperature: float, humidity: float):
         # Assuming `self.model_RF_phase` is the model used for prediction

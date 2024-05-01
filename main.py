@@ -99,11 +99,11 @@ async def get_sensor_history():
     except Exception as ex: raise HTTPException(500, ex)
 
 @app.post("/start", status_code=200)
-def start_process():
+def start_process(is_mature_process:bool=False):
     try:
         if not MOCK_API:
             return {
-                'process_id': StartNewProcess(),
+                'process_id': StartNewProcess(is_mature_process),
                 'message': 'Process Started'
             }
         else:
@@ -161,7 +161,8 @@ async def get_process_data(process_id:str):
                     end_time = datetime.now(),
                     current_phase = 'Phase 1',
                     mature_percentage = 67.5,
-                    mature_result = 'Immature'
+                    mature_result = 'Immature',
+                    is_mature_process = False
                 ).convert_to_dict()
             }
     except Exception as ex: raise HTTPException(500, ex)

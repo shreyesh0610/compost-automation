@@ -28,7 +28,7 @@ def GetCurrentProcessID():
     processData:ProcessData = databaseHelper.GetCurrentProcess()
     return processData.process_id if processData else ''
 
-def StartNewProcess():
+def StartNewProcess(is_mature_process:bool=False):
     print('Starting New Process')
 
     #- If a process is already going on, do not create another process.
@@ -36,9 +36,9 @@ def StartNewProcess():
 
     any_old_process_id:str = GetCurrentProcessID()
 
-    if any_old_process_id: 
+    if any_old_process_id:
         current_process_id = any_old_process_id
-    else: 
+    else:
         current_process_id = create_process_id()
 
         print(f'{current_process_id} >> Inserting New Process Data')
@@ -49,7 +49,8 @@ def StartNewProcess():
                 end_time = None,
                 current_phase = 'Phase 1',
                 mature_percentage = 0,
-                mature_result = 'Immature'
+                mature_result = 'Immature',
+                is_mature_process = is_mature_process
             )
         )
     RPStartCompostProcessor()
@@ -77,81 +78,89 @@ def BackgroundProcess():
                 print('There is no process in progress currently. Sleeping for 2 mins')
                 time.sleep(120)
                 continue
+            processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
 
             RPStartCompostProcessor()
 
-            #* Read sensor data from Arduino
-            #region Sensor Data
-            sensor_data_string = next(arduinoGenerator, None)
-            if not sensor_data_string:
-                print('No Sensor data found to read')
-                time.sleep(120)
-                continue
+            print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Processing')
 
-            # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
-            sensor_data_string = sensor_data_string.lower().strip()
-            if not all([
-                'soil humidity:' in sensor_data_string,
-                'soil temperature:' in sensor_data_string,
-                'soil conductivity:' in sensor_data_string,
-                'soil ph:' in sensor_data_string,
-                'soil nitrogen:' in sensor_data_string,
-                'soil phosphorus:' in sensor_data_string,
-                'soil potassium:' in sensor_data_string,
-            ]):
-                print(f'{current_process_id} >> Invalid reading string = {sensor_data_string}')
-                time.sleep(120)
-                continue
+            if not processData.is_mature_process: #- if its STANDARD process
 
-            split_data = sensor_data_string.split(',')
+                #* Read sensor data from Arduino
+                #region Sensor Data
+                sensor_data_string = next(arduinoGenerator, None)
+                if not sensor_data_string:
+                    print('No Sensor data found to read')
+                    time.sleep(120)
+                    continue
 
-            try: split_numbers = [float(sd.split(':')[-1].strip()) for sd in split_data]
-            except: split_numbers = []
+                # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
+                sensor_data_string = sensor_data_string.lower().strip()
+                if not all([
+                    'soil humidity:' in sensor_data_string,
+                    'soil temperature:' in sensor_data_string,
+                    'soil conductivity:' in sensor_data_string,
+                    'soil ph:' in sensor_data_string,
+                    'soil nitrogen:' in sensor_data_string,
+                    'soil phosphorus:' in sensor_data_string,
+                    'soil potassium:' in sensor_data_string,
+                ]):
+                    print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Invalid reading string = {sensor_data_string}')
+                    time.sleep(120)
+                    continue
 
-            if len(split_numbers) != 7:
-                print(f'{current_process_id} >> Sensor values are not equal to 7 = {sensor_data_string}')
-                time.sleep(120)
-                continue
+                split_data = sensor_data_string.split(',')
 
-            sensorData:SensorData = SensorData(
-                process_id = current_process_id,
-                humidity = split_numbers[0],
-                temperature = split_numbers[1],
-                ec = split_numbers[2],
-                ph = split_numbers[3],
-                nitrogen = split_numbers[4],
-                phosphorus = split_numbers[5],
-                potassium = split_numbers[6],
-                timestamp = datetime.now()
-            )
-            print(f'{current_process_id} >> Inserting sensor data')
-            databaseHelper.InsertSensorData(sensorData=sensorData)
-            #endregion
+                try: split_numbers = [float(sd.split(':')[-1].strip()) for sd in split_data]
+                except: split_numbers = []
 
-            #* ML Model
-            #region ML Model
-            predicted_phase = mlHelper.PredictPhase(
-                temperature = sensorData.temperature,
-                humidity = sensorData.humidity,
-            )
+                if len(split_numbers) != 7:
+                    print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Sensor values are not equal to 7 = {sensor_data_string}')
+                    time.sleep(120)
+                    continue
 
-            predicted_maturity = mlHelper.PredictMaturity(
-                temperature = sensorData.temperature,
-                humidity = sensorData.humidity,
-            )
-            #endregion
+                sensorData:SensorData = SensorData(
+                    process_id = current_process_id,
+                    humidity = split_numbers[0],
+                    temperature = split_numbers[1],
+                    ec = split_numbers[2],
+                    ph = split_numbers[3],
+                    nitrogen = split_numbers[4],
+                    phosphorus = split_numbers[5],
+                    potassium = split_numbers[6],
+                    timestamp = datetime.now()
+                )
+                print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Inserting sensor data')
+                databaseHelper.InsertSensorData(sensorData=sensorData)
+                #endregion
 
-            processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
+                #* ML Model
+                #region ML Model
+                predicted_phase = mlHelper.PredictPhase(
+                    temperature = sensorData.temperature,
+                    humidity = sensorData.humidity,
+                )
 
-            # - logic to not let phase go backward
-            try: old_phase = int(processData.current_phase.split('Phase')[1].strip())
-            except: old_phase = 0
-            predicted_phase = predicted_phase if predicted_phase >= old_phase else old_phase
-            # ----------
+                predicted_maturity = mlHelper.PredictMaturity(
+                    temperature = sensorData.temperature,
+                    humidity = sensorData.humidity,
+                )
+                #endregion
+
+                # - logic to not let phase go backward
+                try: old_phase = int(processData.current_phase.split('Phase')[1].strip())
+                except: old_phase = 0
+                predicted_phase = predicted_phase if predicted_phase >= old_phase else old_phase
+                # ----------
+
+            else: #- if process is MATURE process
+                predicted_phase = 4             #- default phase of MATURE process
+                predicted_maturity = 'Mature'   #- default maturity of MATURE process
 
             processData.current_phase = f'Phase {predicted_phase}'
-            processData.mature_result = predicted_maturity if processData.mature_result != "Mature" else processData.mature_result
+            processData.mature_result = predicted_maturity if processData.mature_result != 'Mature' else processData.mature_result
 
+            print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Predicted Phase: {predicted_phase}, Maturity: {predicted_maturity}')
             databaseHelper.UpdateProcessData(processData)
 
             RPSetProcessorPhase(predicted_phase)
