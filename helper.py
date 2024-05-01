@@ -66,6 +66,7 @@ def StopProcess(process_id:str):
         databaseHelper.UpdateProcessData(processData=processData)
 
     RPStopCompostProcessor()
+    RPSetProcessorPhase(0)
     return process_id
 
 def BackgroundProcess():
