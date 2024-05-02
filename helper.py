@@ -76,8 +76,8 @@ def BackgroundProcess():
             #* Get current process id
             current_process_id:str = GetCurrentProcessID()
             if not current_process_id:
-                print('There is no process in progress currently. Sleeping for 2 mins')
-                time.sleep(120)
+                print('There is no process in progress currently. Sleeping')
+                time.sleep(1)
                 continue
             processData:ProcessData = databaseHelper.GetProcessData(process_id = current_process_id)
 
@@ -92,7 +92,7 @@ def BackgroundProcess():
                 sensor_data_string = next(arduinoGenerator, None)
                 if not sensor_data_string:
                     print('No Sensor data found to read')
-                    time.sleep(120)
+                    time.sleep(1)
                     continue
 
                 # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460
@@ -107,7 +107,7 @@ def BackgroundProcess():
                     'soil potassium:' in sensor_data_string,
                 ]):
                     print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Invalid reading string = {sensor_data_string}')
-                    time.sleep(120)
+                    time.sleep(1)
                     continue
 
                 split_data = sensor_data_string.split(',')
@@ -117,7 +117,7 @@ def BackgroundProcess():
 
                 if len(split_numbers) != 7:
                     print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Sensor values are not equal to 7 = {sensor_data_string}')
-                    time.sleep(120)
+                    time.sleep(1)
                     continue
 
                 sensorData:SensorData = SensorData(
@@ -140,11 +140,15 @@ def BackgroundProcess():
                 predicted_phase = mlHelper.PredictPhase(
                     temperature = sensorData.temperature,
                     humidity = sensorData.humidity,
+                    ec = sensorData.ec,
+                    ph = sensorData.ph
                 )
 
                 predicted_maturity = mlHelper.PredictMaturity(
                     temperature = sensorData.temperature,
                     humidity = sensorData.humidity,
+                    ec = sensorData.ec,
+                    ph = sensorData.ph
                 )
                 #endregion
 
@@ -165,7 +169,7 @@ def BackgroundProcess():
             databaseHelper.UpdateProcessData(processData)
 
             RPSetProcessorPhase(predicted_phase)
-            time.sleep(120)
+            time.sleep(1)
 
         except Exception as ex:
             print(ex)

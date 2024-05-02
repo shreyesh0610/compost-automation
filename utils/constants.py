@@ -23,6 +23,6 @@ PROCESSOR_PHASE_PIN_NO_1 = int(os.getenv('PROCESSOR_PHASE_PIN_NO_1', 19))
 PROCESSOR_PHASE_PIN_NO_2 = int(os.getenv('PROCESSOR_PHASE_PIN_NO_2', 20))
 
 #* ML
-DATASET_EXCEL_PATH = os.getenv('DATASET_EXCEL_PATH', f'{CURRENT_DIRECTORY}/ml/dataset.xlsx')
+DATASET_EXCEL_PATH = os.getenv('DATASET_EXCEL_PATH', f'{CURRENT_DIRECTORY}/ml/dataset2.xlsx')
 LR_SHEET_NAME = os.getenv('LR_SHEET_NAME', 'Linear Regression-')
 RF_SHEET_NAME = os.getenv('RF_SHEET_NAME', 'Random Forest')
