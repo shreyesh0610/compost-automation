@@ -63,7 +63,7 @@ def StopProcess(process_id:str):
     if processData:
         processData.end_time = datetime.now()
         print(f'{process_id} >> Updating Process Data')
-        databaseHelper.UpdateStopProcessData(process_id==processData.process_id)
+        databaseHelper.UpdateStopProcessData(process_id=processData.process_id)
 
     RPStopCompostProcessor()
     RPSetProcessorPhase(0)
