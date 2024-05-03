@@ -131,14 +131,12 @@ class DatabaseHelper:
         cursor = self.connection.cursor()
         cursor.execute('''
                     UPDATE process_data
-                    SET end_time = ?,
-                        current_phase = ?,
+                    SET current_phase = ?,
                         mature_percentage = ?,
                         mature_result = ?
                     WHERE process_id = ?;
                     ''',
                     (
-                        convert_datetime_to_string(processData.end_time) if processData.end_time else None,
                         processData.current_phase,
                         processData.mature_percentage,
                         processData.mature_result,
@@ -147,6 +145,23 @@ class DatabaseHelper:
         )
         self.connection.commit()
         cursor.close()
+
+    def UpdateStopProcessData(self, process_id:str):
+        cursor = self.connection.cursor()
+        cursor.execute('''
+                    UPDATE process_data
+                    SET end_time = ?
+                    WHERE process_id = ?;
+                    ''',
+                    (
+                        convert_datetime_to_string(datetime.now()),
+                        process_id
+                    )
+        )
+        self.connection.commit()
+        cursor.close()
+
+
 
     def GetProcessData(self, process_id:str):
         processData:ProcessData = None
