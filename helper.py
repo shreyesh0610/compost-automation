@@ -54,6 +54,7 @@ def StartNewProcess(is_mature_process:bool=False):
             )
         )
     RPStartCompostProcessor()
+    RPSetProcessorPhase(0)
     return current_process_id
 
 def StopProcess(process_id:str):
@@ -89,10 +90,14 @@ def BackgroundProcess():
 
                 #* Read sensor data from Arduino
                 #region Sensor Data
+                print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> Reading Sensor')
                 sensor_data_string = next(arduinoGenerator, None)
                 if not sensor_data_string:
-                    print('No Sensor data found to read')
+                    print(f'{current_process_id} >> {"MATURE" if processData.is_mature_process else "STANDARD"} >> No sensor data found to read.')
                     time.sleep(1)
+                    try: current_phase_no = int(processData.current_phase.split('Phase')[1].strip())
+                    except: current_phase_no = 0
+                    RPSetProcessorPhase(current_phase_no)
                     continue
 
                 # soil humidity: 30.70, soil temperature: 25.90, soil conductivity: 1053, soil ph: 5.10, nitrogen: 181, phosphorus: 465, potassium: 460

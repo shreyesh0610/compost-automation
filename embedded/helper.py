@@ -17,13 +17,15 @@ GPIO.setup(PROCESSOR_PHASE_PIN_NO_2, GPIO.OUT)
 
 
 def RPReadFromArduino(serial_port:str):
-    ser = serial.Serial(port = serial_port, baudrate = 9600)
+    ser = serial.Serial(port = serial_port, baudrate = 9600, timeout = 5)
     ser.flush()
 
     while True:
-        if ser.in_waiting > 0:
-            line = ser.readline().decode('utf-8').strip()
-            yield line
+        try:
+            # if ser.in_waiting > 0:
+                line = ser.readline().decode('utf-8').strip()
+                yield line
+        except: yield ""
 
 def RPStartCompostProcessor():
     print('Set Compost Processor - High')

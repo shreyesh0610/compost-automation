@@ -67,7 +67,7 @@ class MLHelper:
         predicted_phase = self.model_RF_phase.predict(input_df)
         predicted_phase = predicted_phase.round().astype(int)
 
-        # return 4 #! HARDCODED
+        return 3 #! HARDCODED
         return predicted_phase[0]
 
     def PredictMaturity(self, temperature:float, humidity:float, ec: float, ph: float):
