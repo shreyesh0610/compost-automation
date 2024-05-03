@@ -17,7 +17,7 @@ GPIO.setup(PROCESSOR_PHASE_PIN_NO_2, GPIO.OUT)
 
 
 def RPReadFromArduino(serial_port:str):
-    ser = serial.Serial(port = serial_port, baudrate = 9600, timeout = 5)
+    ser = serial.Serial(port = serial_port, baudrate = 9600, timeout = 20)
     ser.flush()
 
     while True:

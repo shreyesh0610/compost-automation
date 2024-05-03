@@ -15,7 +15,7 @@ MOCK_API = True if os.getenv('MOCK_API') and str(os.getenv('MOCK_API')).upper() 
 DATABASE_PATH = os.getenv('DATABASE_PATH', f'{CURRENT_DIRECTORY}/compost.db')
 
 #* Arduino
-ARDUINO_SENSOR_PORT = os.getenv('ARDUINO_SENSOR_PORT', '/dev/ttyUSB0')
+ARDUINO_SENSOR_PORT = os.getenv('ARDUINO_SENSOR_PORT', '/dev/ttyUSB1')
 
 #* RaspberryPi
 PROCESSOR_RUN_PIN_NO = int(os.getenv('PROCESSOR_RUN_PIN_NO', 18))
