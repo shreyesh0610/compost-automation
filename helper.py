@@ -163,6 +163,10 @@ def BackgroundProcess():
                 predicted_phase = predicted_phase if predicted_phase >= old_phase else old_phase
                 # ----------
 
+                #- Logic to hardcode maturity for Phase 1-3
+                if predicted_phase <= 3:
+                    predicted_maturity = "Immature"
+
             else: #- if process is MATURE process
                 predicted_phase = 4             #- default phase of MATURE process
                 predicted_maturity = 'Mature'   #- default maturity of MATURE process
