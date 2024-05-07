@@ -67,7 +67,7 @@ class MLHelper:
         predicted_phase = self.model_RF_phase.predict(input_df)
         predicted_phase = predicted_phase.round().astype(int)
 
-        return 3 #! HARDCODED
+        #return 4 #! HARDCODED
         return predicted_phase[0]
 
     def PredictMaturity(self, temperature:float, humidity:float, ec: float, ph: float):
@@ -75,14 +75,15 @@ class MLHelper:
         input_df = pd.DataFrame({'Temperature': [temperature], 'Humidity': [humidity], 'Ec': [ec], 'Ph': [ph]})
         predicted_maturity = self.model_RF_maturity.predict(input_df)
 
-        # return "Mature" #! HARDCODED
+        #return "Mature" #! HARDCODED
         return predicted_maturity[0]
 
 
 if __name__ == '__main__':
     mlHelper:MLHelper = MLHelper()
 
-    predicted_phase = mlHelper.PredictPhase(29.50, 95, 220,4.90)
-    predicted_maturity = mlHelper.PredictMaturity(29.50, 95, 220,4.90)
-    print(predicted_phase, predicted_maturity)
+    # predicted_phase = mlHelper.PredictPhase(32.9, 81, 211, 5.56)
+    # predicted_maturity = mlHelper.PredictMaturity(32.9, 81, 211, 5.56)
+    # print(predicted_phase, predicted_maturity)
+
 
